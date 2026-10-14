@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 MC Bot List</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">🎮 MC Bot List</a>
+      <div class="nav-links">
+        <a href="/" class="active">الرئيسية</a>
+        <a href="/add.html">➕ إضافة بوت</a>
+        <a href="/dashboard.html">🎛️ لوحة التحكم</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1>أفضل بوتات <span class="gradient-text">ماين كرافت</span></h1>
+      <p>اكتشف، أضف، وصوّت لأفضل بوتات سيرفرات ماين كرافت</p>
+      <div class="hero-buttons">
+        <a href="/add.html" class="btn btn-primary">➕ إضافة بوت</a>
+        <a href="#bots" class="btn btn-secondary">🚀 تصفح البوتات</a>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-number" id="total-bots">0</span>
+          <span class="stat-label">بوت</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" id="total-votes">0</span>
+          <span class="stat-label">صوت</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">24/7</span>
+          <span class="stat-label">متاح</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="search-section" id="bots">
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="🔍 ابحث عن بوت..." class="search-input">
+      <select id="category-filter" class="category-filter">
+        <option value="all">📁 كل التصنيفات</option>
+        <option value="moderation">🛡️ إدارة</option>
+        <option value="utility">🔧 أدوات</option>
+        <option value="economy">💰 اقتصاد</option>
+        <option value="games">🎮 ألعاب</option>
+        <option value="music">🎵 موسيقى</option>
+      </select>
+      <select id="sort-filter" class="sort-filter">
+        <option value="votes">🔥 الأكثر تصويتاً</option>
+        <option value="newest">🆕 الأحدث</option>
+        <option value="name">🔤 الاسم</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="bots-section">
+    <div class="bots-grid" id="bots-container">
+      <div class="loading">⏳ جاري تحميل البوتات...</div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2024 MC Bot List - صُنع بـ 💙</p>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>➕ إضافة بوت - MC Bot List</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .form-section { max-width: 700px; margin: 60px auto; padding: 0 24px; }
+    .form-card {
+      background: linear-gradient(145deg, rgba(21, 101, 192, 0.08), rgba(2, 6, 13, 0.8));
+      border: 1px solid rgba(30, 136, 229, 0.2);
+      border-radius: 24px;
+      padding: 40px;
+    }
+    .form-header { text-align: center; margin-bottom: 35px; }
+    .form-header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #42a5f5, #1565c0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .form-header p { color: #7ba7cc; font-size: 15px; }
+    .form-group { margin-bottom: 24px; }
+    .form-group label {
+      display: block;
+      color: #42a5f5;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .form-group label .required { color: #ff5252; }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(2, 6, 13, 0.7);
+      border: 1px solid rgba(30, 136, 229, 0.2);
+      border-radius: 12px;
+      color: #e3f2fd;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: #1e88e5;
+      box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
+    }
+    .form-group textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+    .form-group select option { background: #050a14; color: #e3f2fd; }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #7ba7cc; opacity: 0.6; }
+    .form-hint { font-size: 12px; color: #7ba7cc; margin-top: 6px; opacity: 0.8; }
+    .form-buttons { display: flex; gap: 12px; margin-top: 30px; }
+    .form-buttons .btn { flex: 1; justify-content: center; padding: 15px; font-size: 16px; }
+    .alert {
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-success {
+      background: rgba(76, 175, 80, 0.15);
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      color: #81c784;
+    }
+    .alert-error {
+      background: rgba(244, 67, 54, 0.15);
+      border: 1px solid rgba(244, 67, 54, 0.4);
+      color: #ef5350;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">🎮 MC Bot List</a>
+      <div class="nav-links">
+        <a href="/">الرئيسية</a>
+        <a href="/add.html" class="active">➕ إضافة بوت</a>
+        <a href="/dashboard.html">🎛️ لوحة التحكم</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="form-section">
+    <div class="form-card">
+
+      <div class="form-header">
+        <h1>➕ إضافة بوت جديد</h1>
+        <p>أضف بوتك إلى القائمة ودع المستخدمين يصوتون له</p>
+      </div>
+
+      <div id="alert" class="alert"></div>
+
+      <form id="add-bot-form">
+
+        <div class="form-group">
+          <label for="name">اسم البوت <span class="required">*</span></label>
+          <input type="text" id="name" placeholder="مثال: SkyBot" maxlength="50" required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">وصف البوت <span class="required">*</span></label>
+          <textarea id="description" placeholder="اكتب وصفاً للبوت (10 أحرف على الأقل)..." maxlength="500" required></textarea>
+          <div class="form-hint">الوصف النصي فقط (لا تضع روابط هنا)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="category">التصنيف <span class="required">*</span></label>
+          <select id="category" required>
+            <option value="">-- اختر التصنيف --</option>
+            <option value="moderation">🛡️ إدارة</option>
+            <option value="utility">🔧 أدوات</option>
+            <option value="economy">💰 اقتصاد</option>
+            <option value="games">🎮 ألعاب</option>
+            <option value="music">🎵 موسيقى</option>
+            <option value="general">📁 عام</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="invite">رابط دعوة البوت (اختياري)</label>
+          <input type="text" id="invite" placeholder="https://discord.gg/xxxxx">
+          <div class="form-hint">ضع رابط الدعوة هنا، وليس في الوصف</div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" class="btn btn-primary" id="submit-btn">🚀 إضافة البوت</button>
+          <a href="/" class="btn btn-secondary">← رجوع</a>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2024 MC Bot List - صُنع بـ 💙</p>
+  </footer>
+
+  <script>
+    const form = document.getElementById('add-bot-form');
+    const alertBox = document.getElementById('alert');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function showAlert(message, type) {
+      alertBox.textContent = message;
+      alertBox.className = 'alert alert-' + type + ' show';
+      setTimeout(function() { alertBox.classList.remove('show'); }, 5000);
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const category = document.getElementById('category').value;
+      const invite = document.getElementById('invite').value.trim();
+
+      if (name.length < 2) {
+        showAlert('❌ اسم البوت مطلوب (حرفان على الأقل)', 'error');
+        return;
+      }
+      if (description.length < 10) {
+        showAlert('❌ الوصف مطلوب (10 أحرف على الأقل) — الطول الحالي: ' + description.length, 'error');
+        return;
+      }
+      if (!category) {
+        showAlert('❌ اختر تصنيفاً للبوت', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ جاري الإضافة...';
+
+      try {
+        const res = await fetch('/api/bots', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            description: description,
+            category: category,
+            invite: invite
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'فشل الإضافة');
+        }
+
+        showAlert('✅ تم إضافة البوت بنجاح!', 'success');
+        form.reset();
+
+        setTimeout(function() {
+          window.location.href = '/';
+        }, 1500);
+
+      } catch (err) {
+        showAlert('❌ ' + err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 إضافة البوت';
+      }
+    });
+  </script>
+
+</body>
+</html>

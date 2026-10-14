@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎛️ لوحة التحكم - MC Bot List</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .dashboard { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
+    .dash-header { text-align: center; margin-bottom: 30px; }
+    .dash-header h1 {
+      font-size: 42px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #42a5f5, #1565c0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .dash-header p { color: #7ba7cc; }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 14px 30px;
+      background: rgba(21, 101, 192, 0.08);
+      color: #42a5f5;
+      border: 1px solid rgba(30, 136, 229, 0.3);
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #1565c0, #0d47a1);
+      color: #fff;
+      box-shadow: 0 8px 25px rgba(21, 101, 192, 0.4);
+    }
+    .tab-btn:hover { transform: translateY(-2px); }
+    .add-bot-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 14px 30px;
+      background: linear-gradient(135deg, #1565c0, #0d47a1);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+      box-shadow: 0 8px 25px rgba(21, 101, 192, 0.4);
+    }
+    .add-bot-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(21, 101, 192, 0.7);
+    }
+    .bots-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+    }
+    .bot-panel {
+      background: linear-gradient(145deg, rgba(21, 101, 192, 0.08), rgba(2, 6, 13, 0.8));
+      border: 1px solid rgba(30, 136, 229, 0.15);
+      border-radius: 20px;
+      padding: 25px;
+      transition: all 0.3s;
+    }
+    .bot-panel:hover {
+      border-color: #1e88e5;
+      box-shadow: 0 15px 40px rgba(21, 101, 192, 0.3);
+    }
+    .bot-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .bot-panel-header h3 { color: #42a5f5; font-size: 20px; }
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ef5350;
+      box-shadow: 0 0 10px #ef5350;
+    }
+    .status-dot.online {
+      background: #4caf50;
+      box-shadow: 0 0 10px #4caf50;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .bot-panel p {
+      color: #7ba7cc;
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    .bot-info {
+      background: rgba(2, 6, 13, 0.6);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      color: #7ba7cc;
+    }
+    .bot-info div { margin-bottom: 5px; }
+    .bot-info span { color: #42a5f5; font-weight: 600; }
+    .bot-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    .btn-start { background: linear-gradient(135deg, #4caf50, #388e3c); color: #fff; }
+    .btn-stop { background: linear-gradient(135deg, #f44336, #c62828); color: #fff; }
+    .btn-restart { background: linear-gradient(135deg, #ff9800, #f57c00); color: #fff; }
+    .btn-delete {
+      background: rgba(244, 67, 54, 0.15);
+      color: #ef5350;
+      border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+    .action-btn:hover { transform: translateY(-2px); }
+    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #7ba7cc;
+      grid-column: 1 / -1;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: linear-gradient(145deg, #071b2f, #02060d);
+      border: 1px solid rgba(30, 136, 229, 0.3);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h2 { color: #42a5f5; margin-bottom: 20px; }
+    .modal .form-group { margin-bottom: 18px; }
+    .modal label {
+      display: block;
+      color: #42a5f5;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .modal input, .modal textarea {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(2, 6, 13, 0.7);
+      border: 1px solid rgba(30, 136, 229, 0.2);
+      border-radius: 10px;
+      color: #e3f2fd;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .modal input:focus, .modal textarea:focus { border-color: #1e88e5; }
+    .modal textarea { min-height: 80px; resize: vertical; }
+    .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-buttons button { flex: 1; padding: 12px; }
+    .alert {
+      padding: 12px 18px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-error { background: rgba(244, 67, 54, 0.15); color: #ef5350; }
+    .alert-success { background: rgba(76, 175, 80, 0.15); color: #81c784; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">🎮 MC Bot List</a>
+      <div class="nav-links">
+        <a href="/">الرئيسية</a>
+        <a href="/add.html">➕ إضافة بوت</a>
+        <a href="/dashboard.html" class="active">🎛️ لوحة التحكم</a>
+        <a href="#" id="user-info">👤 تسجيل الدخول</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="dashboard">
+    <div class="dash-header">
+      <h1>🎛️ لوحة التحكم</h1>
+      <p>شغّل، أوقف، وأعد تشغيل بوتاتك بضغطة زر</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-discord" onclick="switchTab('discord')">
+        🎮 بوتات ديسكورد
+      </button>
+      <button class="tab-btn" id="tab-mc" onclick="switchTab('mc')">
+        ⛏️ بوتات ماين كرافت
+      </button>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <div id="section-discord">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <button class="add-bot-btn" onclick="openModal()">➕ إضافة بوت ديسكورد</button>
+      </div>
+      <div class="bots-list" id="bots-list">
+        <div class="empty">⏳ جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="section-mc" style="display: none;">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <button class="add-bot-btn" onclick="openMCModal()">⛏️ إضافة بوت ماين كرافت</button>
+      </div>
+      <div class="bots-list" id="mc-bots-list">
+        <div class="empty">⏳ جاري التحميل...</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h2>➕ إضافة بوت ديسكورد</h2>
+      <div id="modal-alert" class="alert"></div>
+
+      <div class="form-group">
+        <label>اسم البوت *</label>
+        <input type="text" id="bot-name" placeholder="مثال: MyBot">
+      </div>
+
+      <div class="form-group">
+        <label>التوكن (Token) *</label>
+        <input type="password" id="bot-token" placeholder="MTIzNDU2Nzg5...">
+      </div>
+
+      <div class="form-group">
+        <label>الوصف (اختياري)</label>
+        <textarea id="bot-desc" placeholder="وصف مختصر للبوت..."></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="add-bot-btn" onclick="addBot()" id="submit-btn">🚀 إضافة</button>
+        <button class="action-btn btn-delete" onclick="closeModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="mc-modal">
+    <div class="modal">
+      <h2>⛏️ إضافة بوت ماين كرافت</h2>
+      <div id="mc-modal-alert" class="alert"></div>
+
+      <div class="form-group">
+        <label>اسم البوت *</label>
+        <input type="text" id="mc-name" placeholder="مثال: MyMCBot">
+      </div>
+
+      <div class="form-group">
+        <label>IP السيرفر *</label>
+        <input type="text" id="mc-host" placeholder="play.example.com">
+      </div>
+
+      <div class="form-group">
+        <label>المنفذ (Port)</label>
+        <input type="number" id="mc-port" placeholder="25565" value="25565">
+      </div>
+
+      <div class="form-group">
+        <label>اسم الحساب *</label>
+        <input type="text" id="mc-username" placeholder="MyBot123">
+      </div>
+
+      <div class="form-group">
+        <label>إصدار ماين كرافت (اختياري)</label>
+        <input type="text" id="mc-version" placeholder="1.21.11">
+      </div>
+
+      <div class="modal-buttons">
+        <button class="add-bot-btn" onclick="addMCBot()" id="mc-submit-btn">🚀 إضافة</button>
+        <button class="action-btn btn-delete" onclick="closeMCModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2024 MC Bot List - لوحة التحكم</p>
+  </footer>
+
+  <script>
+    let isLoggedIn = false;
+
+    function showAlert(msg, type, target) {
+      const el = target ? document.getElementById(target) : document.getElementById('alert');
+      el.textContent = msg;
+      el.className = 'alert alert-' + type + ' show';
+      setTimeout(function() { el.classList.remove('show'); }, 4000);
+    }
+
+    function switchTab(tab) {
+      const discordSection = document.getElementById('section-discord');
+      const mcSection = document.getElementById('section-mc');
+      const discordBtn = document.getElementById('tab-discord');
+      const mcBtn = document.getElementById('tab-mc');
+
+      if (tab === 'discord') {
+        discordSection.style.display = 'block';
+        mcSection.style.display = 'none';
+        discordBtn.classList.add('active');
+        mcBtn.classList.remove('active');
+        loadBots();
+      } else {
+        discordSection.style.display = 'none';
+        mcSection.style.display = 'block';
+        discordBtn.classList.remove('active');
+        mcBtn.classList.add('active');
+        loadMCBots();
+      }
+    }
+
+    function openModal() {
+      if (!isLoggedIn) { window.location.href = '/auth/discord'; return; }
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+      document.getElementById('bot-name').value = '';
+      document.getElementById('bot-token').value = '';
+      document.getElementById('bot-desc').value = '';
+    }
+
+    function openMCModal() {
+      if (!isLoggedIn) { window.location.href = '/auth/discord'; return; }
+      document.getElementById('mc-modal').classList.add('show');
+    }
+
+    function closeMCModal() {
+      document.getElementById('mc-modal').classList.remove('show');
+      document.getElementById('mc-name').value = '';
+      document.getElementById('mc-host').value = '';
+      document.getElementById('mc-port').value = '25565';
+      document.getElementById('mc-username').value = '';
+      document.getElementById('mc-version').value = '';
+    }
+
+    async function loadBots() {
+      if (!isLoggedIn) return;
+      try {
+        const res = await fetch('/api/dashboard/bots');
+        if (res.status === 401) {
+          document.getElementById('bots-list').innerHTML =
+            '<div class="empty">🔒 سجّل دخولك أولاً</div>';
+          return;
+        }
+        const bots = await res.json();
+        const list = document.getElementById('bots-list');
+
+        if (bots.length === 0) {
+          list.innerHTML = '<div class="empty">📭 لا توجد بوتات. أضف بوتك الأول!</div>';
+          return;
+        }
+
+        list.innerHTML = bots.map(function(bot) {
+          return '<div class="bot-panel">' +
+            '<div class="bot-panel-header">' +
+              '<h3>🤖 ' + bot.name + '</h3>' +
+              '<div class="status-dot ' + (bot.running ? 'online' : '') + '"></div>' +
+            '</div>' +
+            '<p>' + (bot.description || 'بدون وصف') + '</p>' +
+            '<div class="bot-info">' +
+              '<div>الحالة: <span>' + (bot.running ? '🟢 شغّال' : '🔴 متوقف') + '</span></div>' +
+              (bot.tag ? '<div>الهوية: <span>' + bot.tag + '</span></div>' : '') +
+              (bot.guilds ? '<div>السيرفرات: <span>' + bot.guilds + '</span></div>' : '') +
+            '</div>' +
+            '<div class="bot-actions">' +
+              (!bot.running
+                ? '<button class="action-btn btn-start" onclick="controlBot(' + bot.id + ', \'start\')">▶️ تشغيل</button>'
+                : '<button class="action-btn btn-stop" onclick="controlBot(' + bot.id + ', \'stop\')">⏹️ إيقاف</button>' +
+                  '<button class="action-btn btn-restart" onclick="controlBot(' + bot.id + ', \'restart\')">🔄 إعادة</button>'
+              ) +
+              '<button class="action-btn btn-delete" onclick="deleteBot(' + bot.id + ')">🗑️</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      } catch (err) {
+        document.getElementById('bots-list').innerHTML = '<div class="empty">❌ فشل التحميل</div>';
+      }
+    }
+
+    async function loadMCBots() {
+      if (!isLoggedIn) return;
+      try {
+        const res = await fetch('/api/dashboard/mc-bots');
+        if (res.status === 401) {
+          document.getElementById('mc-bots-list').innerHTML =
+            '<div class="empty">🔒 سجّل دخولك أولاً</div>';
+          return;
+        }
+        const bots = await res.json();
+        const list = document.getElementById('mc-bots-list');
+
+        if (bots.length === 0) {
+          list.innerHTML = '<div class="empty">⛏️ لا توجد بوتات ماين كرافت. أضف بوتك الأول!</div>';
+          return;
+        }
+
+        list.innerHTML = bots.map(function(bot) {
+          return '<div class="bot-panel">' +
+            '<div class="bot-panel-header">' +
+              '<h3>⛏️ ' + bot.name + '</h3>' +
+              '<div class="status-dot ' + (bot.running ? 'online' : '') + '"></div>' +
+            '</div>' +
+            '<p>' + bot.host + ':' + bot.port + '</p>' +
+            '<div class="bot-info">' +
+              '<div>الحالة: <span>' + (bot.running ? '🟢 شغّال' : '🔴 متوقف') + '</span></div>' +
+              '<div>الحساب: <span>' + bot.username + '</span></div>' +
+              (bot.running && bot.health ? '<div>الصحة: <span>' + bot.health + '/20</span></div>' : '') +
+              (bot.running && bot.position ? '<div>الموقع: <span>' + bot.position.x + ', ' + bot.position.y + ', ' + bot.position.z + '</span></div>' : '') +
+            '</div>' +
+            '<div class="bot-actions">' +
+              (!bot.running
+                ? '<button class="action-btn btn-start" onclick="controlMCBot(' + bot.id + ', \'start\')">▶️ تشغيل</button>'
+                : '<button class="action-btn btn-stop" onclick="controlMCBot(' + bot.id + ', \'stop\')">⏹️ إيقاف</button>' +
+                  '<button class="action-btn btn-restart" onclick="controlMCBot(' + bot.id + ', \'restart\')">🔄 إعادة</button>'
+              ) +
+              '<button class="action-btn btn-delete" onclick="deleteMCBot(' + bot.id + ')">🗑️</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      } catch (err) {
+        document.getElementById('mc-bots-list').innerHTML = '<div class="empty">❌ فشل التحميل</div>';
+      }
+    }
+
+    async function addBot() {
+      const name = document.getElementById('bot-name').value.trim();
+      const token = document.getElementById('bot-token').value.trim();
+      const description = document.getElementById('bot-desc').value.trim();
+
+      if (name.length < 2) { showAlert('❌ الاسم مطلوب', 'error', 'modal-alert'); return; }
+      if (token.length < 50) { showAlert('❌ التوكن غير صالح', 'error', 'modal-alert'); return; }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ جاري الإضافة...';
+
+      try {
+        const res = await fetch('/api/dashboard/bots', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, token: token, description: description })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        showAlert('✅ تم إضافة البوت!', 'success');
+        closeModal();
+        loadBots();
+      } catch (err) {
+        showAlert('❌ ' + err.message, 'error', 'modal-alert');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 إضافة';
+      }
+    }
+
+    async function addMCBot() {
+      const name = document.getElementById('mc-name').value.trim();
+      const host = document.getElementById('mc-host').value.trim();
+      const port = document.getElementById('mc-port').value.trim();
+      const username = document.getElementById('mc-username').value.trim();
+      const version = document.getElementById('mc-version').value.trim();
+
+      if (name.length < 2) { showAlert('❌ الاسم مطلوب', 'error', 'mc-modal-alert'); return; }
+      if (!host) { showAlert('❌ IP السيرفر مطلوب', 'error', 'mc-modal-alert'); return; }
+      if (username.length < 3) { showAlert('❌ اسم الحساب مطلوب', 'error', 'mc-modal-alert'); return; }
+
+      const btn = document.getElementById('mc-submit-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ جاري الإضافة...';
+
+      try {
+        const res = await fetch('/api/dashboard/mc-bots', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            host: host,
+            port: port,
+            username: username,
+            version: version
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        showAlert('✅ تم إضافة بوت ماين كرافت!', 'success');
+        closeMCModal();
+        loadMCBots();
+      } catch (err) {
+        showAlert('❌ ' + err.message, 'error', 'mc-modal-alert');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 إضافة';
+      }
+    }
+
+    async function controlBot(id, action) {
+      try {
+        const res = await fetch('/api/dashboard/bots/' + id + '/' + action, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'فشل');
+
+        const labels = { start: 'تم التشغيل ✅', stop: 'تم الإيقاف 🛑', restart: 'تم إعادة التشغيل 🔄' };
+        showAlert(labels[action], 'success');
+        loadBots();
+      } catch (err) {
+        showAlert('❌ ' + err.message, 'error');
+      }
+    }
+
+    async function controlMCBot(id, action) {
+      try {
+        const res = await fetch('/api/dashboard/mc-bots/' + id + '/' + action, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'فشل');
+
+        const labels = { start: 'تم التشغيل ✅', stop: 'تم الإيقاف 🛑', restart: 'تم إعادة التشغيل 🔄' };
+        showAlert(labels[action], 'success');
+        loadMCBots();
+      } catch (err) {
+        showAlert('❌ ' + err.message, 'error');
+      }
+    }
+
+    async function deleteBot(id) {
+      if (!confirm('هل أنت متأكد من الحذف؟')) return;
+      try {
+        await fetch('/api/dashboard/bots/' + id, { method: 'DELETE' });
+        showAlert('🗑️ تم الحذف', 'success');
+        loadBots();
+      } catch (err) {
+        showAlert('❌ فشل الحذف', 'error');
+      }
+    }
+
+    async function deleteMCBot(id) {
+      if (!confirm('هل أنت متأكد من الحذف؟')) return;
+      try {
+        await fetch('/api/dashboard/mc-bots/' + id, { method: 'DELETE' });
+        showAlert('🗑️ تم الحذف', 'success');
+        loadMCBots();
+      } catch (err) {
+        showAlert('❌ فشل الحذف', 'error');
+      }
+    }
+
+    // ===== التحقق من تسجيل الدخول =====
+    async function checkAuth() {
+      try {
+        const res = await fetch('/auth/me');
+        const userEl = document.getElementById('user-info');
+
+        if (res.ok) {
+          const user = await res.json();
+          isLoggedIn = true;
+          userEl.innerHTML = `👤 ${user.username}`;
+          userEl.href = '/auth/logout';
+          userEl.title = 'اضغط لتسجيل الخروج';
+          loadBots();
+          setInterval(function() {
+            const mcSection = document.getElementById('section-mc');
+            if (mcSection && mcSection.style.display !== 'none') {
+              loadMCBots();
+            } else {
+              loadBots();
+            }
+          }, 10000);
+        } else {
+          isLoggedIn = false;
+          userEl.href = '/auth/discord';
+          userEl.textContent = '👤 تسجيل الدخول';
+          document.getElementById('bots-list').innerHTML =
+            '<div class="empty">🔒 سجّل دخولك أولاً لعرض بوتاتك</div>';
+          document.getElementById('mc-bots-list').innerHTML =
+            '<div class="empty">🔒 سجّل دخولك أولاً لعرض بوتاتك</div>';
+        }
+      } catch (err) {
+        const userEl = document.getElementById('user-info');
+        userEl.href = '/auth/discord';
+        userEl.textContent = '👤 تسجيل الدخول';
+      }
+    }
+
+    checkAuth();
+  </script>
+
+</body>
+</html>
